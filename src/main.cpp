@@ -1,13 +1,14 @@
 #include <iostream>
 #include <cstdio>
+#include <ctime>
 
 #include "pool_lib.hpp"
 
 int main () {
+    unsigned int start_time =  clock();
     size_t n_pools = 6;
 
     many_pools<int> c{n_pools};
-
 
     c.connect (1, 2);
     c.connect (2, 3);
@@ -42,6 +43,10 @@ int main () {
     c.water_in (4);
     c.water_in (5);
     c.water_in (6);
+
+    unsigned int end_time =  clock();
+
+    std::cout << "time: " << static_cast <float> (end_time - start_time) / static_cast <float> (CLOCKS_PER_SEC) << std::endl;
 
     return 0;
 }

@@ -15,9 +15,6 @@ class many_pools {
         std::unordered_map<KeyT, std::vector<KeyT>> data;
         std::unordered_map<KeyT, int> connectivity_sets;
         std::unordered_map<int, std::pair<float, int>> volume_and_size_of_set;
-        
-    public:
-        many_pools (size_t sz) : size (sz), num_of_con_set (1) {};
 
         int& pool_set (KeyT key) {
             return connectivity_sets[key];
@@ -30,15 +27,18 @@ class many_pools {
         int& set_size (int set_num) {
             return volume_and_size_of_set[set_num].second;
         }
+        
+    public:
+        many_pools (size_t sz) : size (sz), num_of_con_set (1) {};
 
         void add_water (int index, float volume) {
             if (pool_set (index) == 0) {
                 connectivity_sets[index] = num_of_con_set;
                 ++num_of_con_set;
-                volume_and_size_of_set[pool_set(index)].second = 1;
+                set_size (pool_set (index)) = 1;
             }
 
-            volume_and_size_of_set[pool_set(index)].first += volume;
+            set_volume (pool_set (index)) += volume;
         }
 
         void create_pool_set (KeyT first_key) {
@@ -67,7 +67,7 @@ class many_pools {
                 }
             }
 
-            volume_and_size_of_set[new_comp_num].second = cur_size;
+            set_size(new_comp_num) = cur_size;
         }
 
         void connect (int a, int b) {
@@ -82,11 +82,11 @@ class many_pools {
             }
 
             if (connectivity_sets[a] != connectivity_sets[b]) {
-                float new_volume = volume_and_size_of_set[connectivity_sets[a]].first + volume_and_size_of_set[connectivity_sets[b]].first;
+                float new_volume = set_volume (connectivity_sets[a]) + set_volume (connectivity_sets[b]);
 
                 create_pool_set(a);
 
-                volume_and_size_of_set[pool_set(a)].first = new_volume;
+                set_volume (pool_set (a)) = new_volume;
             }
         }
         
@@ -105,27 +105,24 @@ class many_pools {
                 }
             }
 
-            float prev_volume = volume_and_size_of_set[pool_set(a)].first;
+            float prev_volume = set_volume (pool_set (a));
             create_pool_set(a);
 
             if (connectivity_sets[a] != connectivity_sets[b]) {
-                float new_volume_a = static_cast<float>(volume_and_size_of_set[pool_set(a)].second) 
-                                     / static_cast<float>(volume_and_size_of_set[pool_set(b)].second) 
-                                     * volume_and_size_of_set[pool_set(b)].first;
-                float new_volume_b = volume_and_size_of_set[pool_set(b)].first - new_volume_a;
+                float new_volume_a = static_cast<float>(set_size (pool_set (a))) / static_cast<float>(set_size (pool_set (b))) * set_volume (pool_set (b));
+                float new_volume_b = set_volume (pool_set (b)) - new_volume_a;
 
-                volume_and_size_of_set[pool_set(b)].second = volume_and_size_of_set[pool_set(b)].second 
-                                                                                 - volume_and_size_of_set[pool_set(a)].second;
+                set_size (pool_set (b)) = set_size (pool_set (b)) - set_size (pool_set(a));
 
-                volume_and_size_of_set[pool_set(a)].first = new_volume_a;
-                volume_and_size_of_set[pool_set(b)].first = new_volume_b;
+                set_volume (pool_set (a)) = new_volume_a;
+                set_volume (pool_set (b)) = new_volume_b;
             } else {
-                volume_and_size_of_set[pool_set(a)].first = prev_volume;
+                set_volume (pool_set (a)) = prev_volume;
             }
         };
 
         float water_in (KeyT a) {
-            std::cout << a << "-"<< volume_and_size_of_set[pool_set(a)].first/volume_and_size_of_set[pool_set(a)].second 
+            std::cout << a << "-"<< set_volume (pool_set (a)) / set_size (pool_set (a)) 
                       << " " << pool_set(a) << std::endl;
 
             return volume_and_size_of_set[pool_set(a)].first
@@ -133,7 +130,7 @@ class many_pools {
         }
 
         void show_volume_and_size_of_set (KeyT key) {
-            std::cout << key << ": water_volume = " << volume_and_size_of_set[key].first << "; water_elements_ = " << volume_and_size_of_set[key].second << std::endl;
+            std::cout << key << ": water_volume = " << set_volume (key) << "; water_elements_ = " << set_size (key) << std::endl;
         }    
 };
 

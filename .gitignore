@@ -1,4 +1,7 @@
 *.out
 *.o
 stock_test.txt
-todo.txt
+CMakeFiles
+cmake_install.cmake
+CMakeCache.txt
+Makefile

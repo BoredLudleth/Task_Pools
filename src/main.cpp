@@ -21,7 +21,6 @@ int main () {
     c.connect (5, 6);
 
     c.add_water (1, 6);
-    c.show_volume_and_size_of_set(6);
 
     c.water_in (1);
     c.water_in (2);
@@ -32,10 +31,7 @@ int main () {
 
     c.disconnect(3, 4);
 
-
     c.add_water (1, 6);
-    c.show_volume_and_size_of_set(6);
-    c.show_volume_and_size_of_set(7);
 
     c.water_in (1);
     c.water_in (2);

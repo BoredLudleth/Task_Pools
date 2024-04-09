@@ -122,16 +122,16 @@ class many_pools {
         };
 
         float water_in (KeyT a) {
-            std::cout << a << "-"<< set_volume (pool_set (a)) / set_size (pool_set (a)) 
-                      << " " << pool_set(a) << std::endl;
+            std::cout << a << "-"<< set_volume (pool_set (a)) / set_size (pool_set (a)) << std::endl;
 
             return volume_and_size_of_set[pool_set(a)].first
                    / static_cast<float>(volume_and_size_of_set[pool_set(a)].second);
         }
 
-        void show_volume_and_size_of_set (KeyT key) {
+        // отладочная функция
+        void show_volume_and_size_of_set (int key) {
             std::cout << key << ": water_volume = " << set_volume (key) << "; water_elements_ = " << set_size (key) << std::endl;
-        }    
+        }
 };
 
 #endif

@@ -42,6 +42,8 @@ class many_pools {
         }
 
         void create_pool_set (KeyT first_key) {
+            int prev_pool_set_a = pool_set (first_key);
+
             int cur_size = 0;
             int new_comp_num = num_of_con_set;
             ++num_of_con_set;
@@ -68,6 +70,8 @@ class many_pools {
             }
 
             set_size(new_comp_num) = cur_size;
+
+            volume_and_size_of_set.erase (prev_pool_set_a);
         }
 
         void connect (int a, int b) {
@@ -91,11 +95,18 @@ class many_pools {
         }
         
         void disconnect (int a, int b) {
+            int was_way = 0;
+
             for (auto it = data[a].begin(); it != data[a].end(); ++it) {
                 if (*it == b) {
                     data[a].erase(it);
+                    was_way = 1;
                     break;
                 }
+            }
+
+            if (!was_way) {
+                return;
             }
 
             for (auto it = data[b].begin(); it != data[b].end(); ++it) {
@@ -106,6 +117,7 @@ class many_pools {
             }
 
             float prev_volume = set_volume (pool_set (a));
+
             create_pool_set(a);
 
             if (connectivity_sets[a] != connectivity_sets[b]) {

@@ -6,39 +6,45 @@
 
 int main () {
     unsigned int start_time =  clock();
-    size_t n_pools = 6;
 
-    many_pools<int> c{n_pools};
+    size_t N = 32000000;
+    size_t K = 15000000;
+    size_t L = 22000000;
+    size_t M =  1900000;
 
-    c.connect (1, 2);
-    c.connect (2, 3);
-    c.connect (3, 1);
+    many_pools<int> c{N};
 
-    c.connect (3, 4);
+    for (int i = 1; i <= N; ++i) {
+        c.add_water (i, rand() % 500 + 1);
+    }
 
-    c.connect (4, 5);
-    c.connect (4, 6);
-    c.connect (5, 6);
+    for (int i = 1; i <= K; ++i) {
+        c.connect (rand() % N + 1, rand() % N + 1);
+    }
 
-    c.add_water (1, 6);
+    for (int i = 1; i <= N; ++i) {
+        c.water_in (i);
+    }
 
-    c.water_in (1);
-    c.water_in (2);
-    c.water_in (3);
-    c.water_in (4);
-    c.water_in (5);
-    c.water_in (6);
+    for (int i = 1; i <= L; ++i) {
+        c.add_water (i, rand() % 500 + 1);
+    }
 
-    c.disconnect(3, 4);
+    for (int i = 1; i <= N; ++i) {
+        c.water_in (i);
+    }
 
-    c.add_water (1, 6);
+    for (int i = 1; i <= M; ++i) {
+        c.disconnect (rand() % N + 1, rand() % N + 1);
+    }
 
-    c.water_in (1);
-    c.water_in (2);
-    c.water_in (3);
-    c.water_in (4);
-    c.water_in (5);
-    c.water_in (6);
+    for (int i = 1; i <= L; ++i) {
+        c.add_water (i, rand() % 500 + 1);
+    }
+
+    for (int i = 1; i <= N; ++i) {
+        c.water_in (i);
+    }
 
     unsigned int end_time =  clock();
 

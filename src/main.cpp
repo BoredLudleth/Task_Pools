@@ -1,25 +1,25 @@
 #include <iostream>
-#include <cstdio>
 #include <ctime>
 
 #include "pool_lib.hpp"
+#include "rand_values.hpp"
 
 int main () {
     unsigned int start_time =  clock();
 
-    size_t N = 32000000;
-    size_t K = 15000000;
-    size_t L = 22000000;
+    size_t N = 3200000;
+    size_t K = 1500000;
+    size_t L = 2200000;
     size_t M =  1900000;
 
     many_pools<int> c{N};
 
     for (int i = 1; i <= N; ++i) {
-        c.add_water (i, rand() % 500 + 1);
+        c.add_water (i, rand_water ());
     }
 
     for (int i = 1; i <= K; ++i) {
-        c.connect (rand() % N + 1, rand() % N + 1);
+        c.connect (rand_pool (N), rand_pool (N));
     }
 
     for (int i = 1; i <= N; ++i) {
@@ -27,7 +27,7 @@ int main () {
     }
 
     for (int i = 1; i <= L; ++i) {
-        c.add_water (i, rand() % 500 + 1);
+        c.add_water (i, rand_water ());
     }
 
     for (int i = 1; i <= N; ++i) {
@@ -35,11 +35,11 @@ int main () {
     }
 
     for (int i = 1; i <= M; ++i) {
-        c.disconnect (rand() % N + 1, rand() % N + 1);
+        c.disconnect (rand_pool (N), rand_pool (N));
     }
 
     for (int i = 1; i <= L; ++i) {
-        c.add_water (i, rand() % 500 + 1);
+        c.add_water (i, rand_water ());
     }
 
     for (int i = 1; i <= N; ++i) {

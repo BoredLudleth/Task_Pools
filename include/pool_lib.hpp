@@ -2,7 +2,7 @@
 #define POOL_LIB_HPP
 
 #include <unordered_map>
-#include <vector>
+#include <list>
 #include <deque>
 #include <iterator>
 
@@ -10,9 +10,9 @@ template <typename KeyT = int>
 class many_pools {
     private:
         size_t size;
-        size_t num_of_con_set;
+        size_t num_of_set;
 
-        std::unordered_map<KeyT, std::vector<KeyT>> data;
+        std::unordered_map<KeyT, std::list<KeyT>> data;
         std::unordered_map<KeyT, int> connectivity_sets;
         std::unordered_map<int, std::pair<float, int>> volume_and_size_of_set;
 
@@ -27,26 +27,43 @@ class many_pools {
         int& set_size (int set_num) {
             return volume_and_size_of_set[set_num].second;
         }
+
+        int& pool_set_size (KeyT index) {
+            return set_size (pool_set (index));
+        }
+
+        float& pool_set_volume (KeyT index) {
+            return set_volume (pool_set (index));
+        }
         
+        bool is_null_set (int index) {
+            return pool_set (index) == 0;
+        }
+
+        bool is_in_diff_set (KeyT a, KeyT b) {
+            return pool_set (a) != pool_set (b);
+        }
+
     public:
-        many_pools (size_t sz) : size (sz), num_of_con_set (1) {};
+        many_pools (size_t sz) : size (sz), num_of_set (0) {};
+
 
         void add_water (int index, float volume) {
-            if (pool_set (index) == 0) {
-                connectivity_sets[index] = num_of_con_set;
-                ++num_of_con_set;
-                set_size (pool_set (index)) = 1;
+            if (is_null_set (index)) {
+                ++num_of_set;
+                pool_set (index) = num_of_set;
+                pool_set_size (index) = 1;
             }
 
-            set_volume (pool_set (index)) += volume;
+            pool_set_volume (index) += volume;
         }
 
         void create_pool_set (KeyT first_key) {
             int prev_pool_set_a = pool_set (first_key);
 
             int cur_size = 0;
-            int new_comp_num = num_of_con_set;
-            ++num_of_con_set;
+            ++num_of_set;
+            int new_comp_num = num_of_set;
 
             std::deque <KeyT> set_of_children;
             set_of_children.push_front(first_key);
@@ -57,13 +74,13 @@ class many_pools {
                 cur_key = set_of_children.back ();
                 set_of_children.pop_back ();
 
-                if (connectivity_sets[cur_key] != new_comp_num) {
+                if (pool_set (cur_key) != new_comp_num) {
                     ++cur_size;
-                    connectivity_sets[cur_key] = new_comp_num;
+                    pool_set (cur_key) = new_comp_num;
                 }
 
                 for (auto it = data[cur_key].begin(); it != data[cur_key].end(); ++it) {
-                    if (connectivity_sets[*it] != new_comp_num) {
+                    if (pool_set (*it) != new_comp_num) {
                         set_of_children.push_front(*it);
                     }
                 }
@@ -78,23 +95,27 @@ class many_pools {
             data[a].push_back(b);
             data[b].push_back(a);
 
-            if (connectivity_sets[a] == 0) {
-                int new_comp_num = num_of_con_set;
-                ++num_of_con_set;
+            if (is_null_set (a)) {
+                ++num_of_set;
+                int new_comp_num = num_of_set;
 
-                connectivity_sets[a] = new_comp_num;
+                pool_set (a) = new_comp_num;
             }
 
-            if (connectivity_sets[a] != connectivity_sets[b]) {
-                float new_volume = set_volume (connectivity_sets[a]) + set_volume (connectivity_sets[b]);
+            if (is_in_diff_set (a, b)) {
+                float new_volume = pool_set_volume (a) + pool_set_volume (b);
 
                 create_pool_set(a);
 
-                set_volume (pool_set (a)) = new_volume;
+                pool_set_volume (a) = new_volume;
             }
         }
         
         void disconnect (int a, int b) {
+            if (a == b) {
+                return;
+            }
+
             int was_way = 0;
 
             for (auto it = data[a].begin(); it != data[a].end(); ++it) {
@@ -116,25 +137,25 @@ class many_pools {
                 }
             }
 
-            float prev_volume = set_volume (pool_set (a));
+            float prev_volume = pool_set_volume (a);
 
             create_pool_set(a);
 
-            if (connectivity_sets[a] != connectivity_sets[b]) {
-                float new_volume_a = static_cast<float>(set_size (pool_set (a))) / static_cast<float>(set_size (pool_set (b))) * set_volume (pool_set (b));
-                float new_volume_b = set_volume (pool_set (b)) - new_volume_a;
+            if (is_in_diff_set (a, b)) {
+                float new_volume_a = static_cast<float>(pool_set_size (a)) / static_cast<float>(pool_set_size (b)) * pool_set_volume (b);
+                float new_volume_b = pool_set_volume (b) - new_volume_a;
 
-                set_size (pool_set (b)) = set_size (pool_set (b)) - set_size (pool_set(a));
+                pool_set_size (b) = pool_set_size (b) - pool_set_size (a);
 
-                set_volume (pool_set (a)) = new_volume_a;
-                set_volume (pool_set (b)) = new_volume_b;
+                pool_set_volume (a) = new_volume_a;
+                pool_set_volume (b) = new_volume_b;
             } else {
-                set_volume (pool_set (a)) = prev_volume;
+                pool_set_volume (a) = prev_volume;
             }
         };
 
         float water_in (KeyT a) {
-            std::cout << a << "-"<< set_volume (pool_set (a)) / set_size (pool_set (a)) << std::endl;
+            // std::cout << a << "-"<< pool_set_volume (a) / pool_set_size (a) << std::endl;
 
             return volume_and_size_of_set[pool_set(a)].first
                    / static_cast<float>(volume_and_size_of_set[pool_set(a)].second);

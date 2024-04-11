@@ -12,7 +12,7 @@ int main () {
     size_t L = 2200000;
     size_t M =  1900000;
 
-    many_pools<int> c{N};
+    many_pools<int, int> c{N};
 
     for (int i = 1; i <= N; ++i) {
         c.add_water (i, rand_water ());

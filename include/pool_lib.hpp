@@ -68,12 +68,11 @@ class many_pools {
             pool_set_volume (index) += volume;
         }
 
-        void create_pool_set (KeyT first_key) {
+        void create_pool_set (KeyT first_key, SetT new_comp_num) {
             SetT prev_pool_set_a = pool_set (first_key);
 
             int cur_size = 0;
             ++num_of_set;
-            SetT new_comp_num = num_of_set;
 
             std::deque <KeyT> set_of_children;
             set_of_children.push_front(first_key);
@@ -100,9 +99,6 @@ class many_pools {
         }
 
         void connect (KeyT a, KeyT b) {
-            data[a].push_back(b);
-            data[b].push_back(a);
-
             if (is_null_set (a)) {
                 ++num_of_set;
                 SetT new_comp_num = num_of_set;
@@ -113,10 +109,14 @@ class many_pools {
             if (is_in_diff_set (a, b)) {
                 float new_volume = pool_set_volume (a) + pool_set_volume (b);
 
-                create_pool_set(a);
+                create_pool_set(b, pool_set(a));
 
                 pool_set_volume (a) = new_volume;
-            }
+            }            
+            
+            data[a].push_back(b);
+            data[b].push_back(a);
+
         }
         
         void disconnect (KeyT a, KeyT b) {
@@ -134,7 +134,7 @@ class many_pools {
             
             float prev_volume = pool_set_volume (a);
 
-            create_pool_set(a);
+            create_pool_set(a, num_of_set);
 
             if (is_in_diff_set (a, b)) {
                 float new_volume_a = static_cast<float>(pool_set_size (a)) / static_cast<float>(pool_set_size (b)) * pool_set_volume (b);
@@ -150,7 +150,7 @@ class many_pools {
         };
 
         float water_in (KeyT a) {
-            // std::cout << a << "-"<< pool_set_volume (a) / pool_set_size (a) << std::endl;
+            std::cout << a << "-"<< pool_set_volume (a) / pool_set_size (a) << std::endl;
 
             return volume_and_size_of_set[pool_set(a)].first
                    / static_cast<float>(volume_and_size_of_set[pool_set(a)].second);

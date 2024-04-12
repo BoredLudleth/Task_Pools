@@ -7,9 +7,9 @@
 int main () {
     unsigned int start_time =  clock();
 
-    size_t N = 3200000;
-    size_t K = 1500000;
-    size_t L = 2200000;
+    size_t N = 32000000;
+    size_t K = 15000000;
+    size_t L = 22000000;
     size_t M =  1900000;
 
     many_pools<int, int> c{N};

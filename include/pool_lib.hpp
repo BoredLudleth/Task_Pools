@@ -16,35 +16,35 @@ class many_pools {
         std::unordered_map<KeyT, SetT> connectivity_sets;
         std::unordered_map<SetT, std::pair<float, int>> volume_and_size_of_set;
 
-        SetT& pool_set (KeyT key) {
+        SetT& pool_set (KeyT& key) {
             return connectivity_sets[key];
         }
 
-        float& set_volume (SetT set_num) {
+        float& set_volume (SetT& set_num) {
             return volume_and_size_of_set[set_num].first;
         }
 
-        int& set_size (SetT set_num) {
+        int& set_size (SetT& set_num) {
             return volume_and_size_of_set[set_num].second;
         }
 
-        int& pool_set_size (KeyT index) {
+        int& pool_set_size (KeyT& index) {
             return set_size (pool_set (index));
         }
 
-        float& pool_set_volume (KeyT index) {
+        float& pool_set_volume (KeyT& index) {
             return set_volume (pool_set (index));
         }
         
-        bool is_null_set (KeyT index) {
+        bool is_null_set (KeyT& index) {
             return pool_set (index) == 0;
         }
 
-        bool is_in_diff_set (KeyT a, KeyT b) {
+        bool is_in_diff_set (KeyT& a, KeyT& b) {
             return pool_set (a) != pool_set (b);
         }
 
-        bool erase_edge_ab (KeyT a, KeyT b) {
+        bool erase_edge_ab (KeyT& a, KeyT& b) {
             for (auto it = data[a].begin(); it != data[a].end(); ++it) {
                 if (*it == b) {
                     data[a].erase(it);
@@ -97,13 +97,11 @@ class many_pools {
             }
 
             set_size(new_comp_num) = cur_size;
-
-            // volume_and_size_of_set.erase (prev_pool_set_a);
         }
 
         void connect (KeyT a, KeyT b) {
-            data[a].emplace_back(b);
-            data[b].emplace_back(a);
+            data[a].push_back(b);
+            data[b].push_back(a);
 
             if (is_null_set (a)) {
                 ++num_of_set;

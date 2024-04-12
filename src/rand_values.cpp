@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "rand_values.hpp"
 
 float rand_water () {

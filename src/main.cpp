@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <cstdlib>
 
 #include "pool_lib.hpp"
 #include "rand_values.hpp"

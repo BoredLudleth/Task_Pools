@@ -44,6 +44,17 @@ class many_pools {
             return pool_set (a) != pool_set (b);
         }
 
+        bool erase_edge_ab (KeyT a, KeyT b) {
+            for (auto it = data[a].begin(); it != data[a].end(); ++it) {
+                if (*it == b) {
+                    data[a].erase(it);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
     public:
         many_pools (size_t sz) : size (sz), num_of_set (0) {};
 
@@ -117,25 +128,12 @@ class many_pools {
 
             bool was_way = false;
 
-            for (auto it = data[a].begin(); it != data[a].end(); ++it) {
-                if (*it == b) {
-                    data[a].erase(it);
-                    was_way = true;
-                    break;
-                }
-            }
-
-            if (!was_way) {
+            if (!erase_edge_ab (a, b)) {
                 return;
             }
 
-            for (auto it = data[b].begin(); it != data[b].end(); ++it) {
-                if (*it == a) {
-                    data[b].erase(it);
-                    break;
-                }
-            }
-
+            erase_edge_ab (b, a);
+            
             float prev_volume = pool_set_volume (a);
 
             create_pool_set(a);
@@ -154,7 +152,7 @@ class many_pools {
         };
 
         float water_in (KeyT a) {
-            std::cout << a << "-"<< pool_set_volume (a) / pool_set_size (a) << std::endl;
+            // std::cout << a << "-"<< pool_set_volume (a) / pool_set_size (a) << std::endl;
 
             return volume_and_size_of_set[pool_set(a)].first
                    / static_cast<float>(volume_and_size_of_set[pool_set(a)].second);

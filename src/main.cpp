@@ -8,10 +8,10 @@
 int main () {
     unsigned int start_time =  clock();
 
-    const size_t N = 3200000;
-    const size_t K = 1500000;
-    const size_t L = 2200000;
-    const size_t M =  190000;
+    const size_t N = 32000000;
+    const size_t K = 15000000;
+    const size_t L = 22000000;
+    const size_t M =  1900000;
 
     volatile float x = -1;
 

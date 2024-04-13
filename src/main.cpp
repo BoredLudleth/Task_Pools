@@ -8,32 +8,34 @@
 int main () {
     unsigned int start_time =  clock();
 
-    const size_t N = 32000000;
-    const size_t K = 15000000;
-    const size_t L = 22000000;
-    const size_t M =  1900000;
+    const size_t N = 3200000;
+    const size_t K = 1500000;
+    const size_t L = 2200000;
+    const size_t M =  190000;
+
+    volatile float x = -1;
 
     many_pools<int, int> c{N};
 
     for (size_t i = 1; i <= N; ++i) {
         c.add_water (i, rand_water ());
-    } // 3.8 sec
+    }
 
     for (size_t i = 1; i <= K; ++i) {
         c.connect (rand_pool (N), rand_pool (N));
-    } // 14 sec
+    }
 
     for (size_t i = 1; i <= N; ++i) {
-        c.water_in (i);
-    } // 1 sec
+        x = c.water_in (i);
+    }
 
     for (size_t i = 1; i <= L; ++i) {
         c.add_water (i, rand_water ());
-    } // 1 sec
+    }
 
     for (size_t i = 1; i <= N; ++i) {
-        c.water_in (i);
-    } // 1 sec
+        x = c.water_in (i);
+    }
 
     for (size_t i = 1; i <= M; ++i) {
         c.disconnect (rand_pool (N), rand_pool (N));
@@ -44,7 +46,7 @@ int main () {
     }
 
     for (size_t i = 1; i <= N; ++i) {
-        c.water_in (i);
+        x = c.water_in (i);
     }
 
     unsigned int end_time =  clock();
